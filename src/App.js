@@ -1,11 +1,27 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, Fragment} from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Gallery from './components/Gallery';
 import SearchBar from './components/SearchBar';
+import ArtistView from './components/ArtistView';
+import AlbumView from './components/AlbumView';
+import './App.css';
+
 function App() {
   let [message, setMessage] = useState('Seach for music')
   let [search, setSearch] = useState('')
   let [data, setData] = useState([])
+
   const API_URL = 'https://itunes.apple.com/search?term='
+
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
   useEffect(()=>{
     if(search){
     const fetchData = async () => {
@@ -20,17 +36,27 @@ function App() {
     }
     fetchData()
     }
-  }, [search])
-  const handleSearch = (e, term) => {
+  }, [search])const handleSearch = (e, term) => {
     e.preventDefault();
     setSearch(term)
   }
   return (
-    <div className="App">
-      <SearchBar handleSearch={handleSearch}/>
-      {message}
-      <Gallery data={data}/>
+    <div>
+    {message}
+        <Router>
+            <Routes>
+                <Route path="/" element={
+                    <Fragment>
+                        <SearchBar handleSearch = {handleSearch}/>
+                        <Gallery data={data} />
+                    </Fragment>
+                } />
+                <Route path="/album/:id" element={<AlbumView />} />
+                <Route path="/artist/:id" element={<ArtistView />} />
+            </Routes>
+        </Router>
     </div>
-  );
+)
+
 }
 export default App;
